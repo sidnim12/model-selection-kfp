@@ -1,0 +1,57 @@
+project:
+  name: "robustness-aware-model-selection-kfp"
+  version: "0.1.0"
+
+data:
+  dataset_path: "data/sample/sample.csv"
+  target_col: "target"
+  time_col: null
+  id_cols: []
+
+split:
+  method: "auto"
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  seed: 42
+
+models:
+  candidates:
+    - "ridge"
+    - "random_forest"
+    - "hist_gradient_boosting"
+
+metrics:
+  primary: "rmse"
+  additional: ["mae", "r2"]
+
+stress_tests:
+  enabled: true
+
+  noise:
+    enabled: true
+    levels: [0.00, 0.05, 0.10, 0.20]
+    numeric_only: true
+
+  missingness:
+    enabled: true
+    levels: [0.00, 0.05, 0.10, 0.20]
+    strategy: "mask"
+    numeric_only: false
+
+  covariate_shift:
+    enabled: true
+    levels: [0.00, 0.20, 0.40]
+    method: "quantile_shift"
+
+robustness:
+  aggregation: "mean"
+  clamp_min: 0.0
+  clamp_max: 1.0
+
+selection:
+  w_quality: 0.60
+  w_robustness: 0.40
+
+artifacts:
+  root_dir: "artifacts"
